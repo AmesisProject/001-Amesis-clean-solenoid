@@ -16,8 +16,11 @@
 //*************************
 //Declaration des variables globales
 //*************************
-float TI;                 // Temps d'ouverture et de fermeture de l'injecteur
-float PotarValeur;        // Valeur brute de lecture [0;1023]
+float         TI;                 // Temps d'ouverture et de fermeture de l'injecteur
+float         PotarValeur;        // Valeur brute de lecture [0;1023]
+unsigned long g_time_cycle_start; // Temps lors du demarrage du cycle
+unsigned long g_delay;            // valeurs de temporisation
+unsigned int  g_cycle;            // identification du cycle [0;1]
 
 //*****************
 //Setup
@@ -30,6 +33,9 @@ void setup() {
   pinMode(PIN_RELAIS_1, OUTPUT);  // relais 1 en sortie
   pinMode(PIN_RELAIS_2, OUTPUT);  // relais 2 en sortie
   pinMode(PIN_POTAR, INPUT);      // pontentiometre en entre
+
+  g_cycle = LOW;
+  g_time_cycle_start = millis();
 
   //Temoin d'initialisation de la fin du setup
   digitalWrite(PIN_LED, HIGH);
@@ -54,15 +60,19 @@ void setup() {
 //Loop
 //*****************
 void loop() {
-  PotarValeur = analogRead(PIN_POTAR);  //lecture du potentiometre valeur de 0 = 1023
+  long  l_act_time = millis();
+
+  PotarValeur = analogRead(PIN_POTAR);  // lecture du potentiometre valeur de 0 = 1023
   TI = map(PotarValeur,0,1023,1,50);    // convertion proportionnelle de 0-1023 a 1-50
-  Serial.println(TI);                   //envoie la valeur TI sur le port serie
-  digitalWrite(PIN_LED, HIGH);          // Allume la led
-  digitalWrite(PIN_RELAIS_1, HIGH);     // Relais 1 en action
-  digitalWrite(PIN_RELAIS_2, LOW);      // relais 2 en repos
-  delay (TI * K_TIME_COEF);             //Valeur pour regler la rapidité d'ouverture
-  digitalWrite(PIN_LED, LOW);           // Extinction de la led
-  digitalWrite(PIN_RELAIS_1, LOW);      // relais 1 en repos
-  digitalWrite(PIN_RELAIS_2, HIGH);     // relais 2 en action
-  delay (TI * K_TIME_COEF);             //Valeur pour regler la rapidité de fermeture
+  g_delay = TI * K_TIME_COEF;
+
+  if (g_time_cycle_start + g_delay < l_act_time)
+  {
+    g_time_cycle_start = l_act_time;
+    g_cycle = !g_cycle;                   // Inversion de la valeur des relais
+    Serial.println(TI);                   // envoie la valeur TI sur le port serie
+    digitalWrite(PIN_LED, g_cycle);       // Allume la led
+    digitalWrite(PIN_RELAIS_1, g_cycle);  // Relais 1 en action
+    digitalWrite(PIN_RELAIS_2, !g_cycle); // relais 2 en repos
+  }
 }
