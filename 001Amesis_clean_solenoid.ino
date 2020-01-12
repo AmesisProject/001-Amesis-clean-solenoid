@@ -16,10 +16,9 @@
 //*************************
 //Declaration des variables globales
 //*************************
-float         TI;                 // Temps d'ouverture et de fermeture de l'injecteur
 float         PotarValeur;        // Valeur brute de lecture [0;1023]
 unsigned long g_time_cycle_start; // Temps lors du demarrage du cycle
-unsigned long g_delay;            // valeurs de temporisation
+unsigned long g_delay;            // Temps d'ouverture et de fermeture de l'injecteur
 unsigned int  g_cycle;            // identification du cycle [0;1]
 
 //*****************
@@ -63,14 +62,13 @@ void loop() {
   long  l_act_time = millis();
 
   PotarValeur = analogRead(PIN_POTAR);  // lecture du potentiometre valeur de 0 = 1023
-  TI = map(PotarValeur,0,1023,1,50);    // convertion proportionnelle de 0-1023 a 1-50
-  g_delay = TI * K_TIME_COEF;
+  g_delay = map(PotarValeur * PotarValeur,0,1056529,20,2000); // convertion quadratique ramenant entre 20ms et 2s de temporisation (de 50Hz a 0.5Hz)
 
   if (g_time_cycle_start + g_delay < l_act_time)
   {
     g_time_cycle_start = l_act_time;
     g_cycle = !g_cycle;                   // Inversion de la valeur des relais
-    Serial.println(TI);                   // envoie la valeur TI sur le port serie
+    Serial.println(g_delay);              // envoie la valeur de la temporisation sur le port serie
     digitalWrite(PIN_LED, g_cycle);       // Allume la led
     digitalWrite(PIN_RELAIS_1, g_cycle);  // Relais 1 en action
     digitalWrite(PIN_RELAIS_2, !g_cycle); // relais 2 en repos
