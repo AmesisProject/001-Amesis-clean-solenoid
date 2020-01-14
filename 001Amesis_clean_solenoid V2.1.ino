@@ -1,8 +1,12 @@
-//22/06/2019 
-//Amesis Project 
+//Amesis Project
+//22/06/2019 V2.0
+//14/01/2020 V2.1
+ 
 //https://www.youtube.com/channel/UCCexVZN3UYSep2lsj2jVjdg?view_as=subscriber
 //https://create.arduino.cc/projecthub/AmesisProject/001-amesis-clean-solenoid-d1f4ee
-//Amesis_clean_solenoid_V2.0
+
+//Amesis_clean_solenoid_V2.1 (By Amesis Project https://github.com/AmesisProject & Dawnaur https://github.com/Dawnaur)
+//https://github.com/AmesisProject/-001-Amesis-clean-solenoid
 
 //*************************
 // Constantes
